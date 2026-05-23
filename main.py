@@ -10,6 +10,7 @@ import subprocess
 console = Console()
 
 server_process = None
+server_running = False
 logs = []
 
 
@@ -34,9 +35,9 @@ def add_log(message):
 
 
 def start_server():
-    global server_process
+    global server_process, server_running
 
-    if server_process is None:
+    if not server_running:
 
         server_process = subprocess.Popen(
             ["python", "-m", "http.server", "8080"],
@@ -44,30 +45,33 @@ def start_server():
             stderr=subprocess.DEVNULL
         )
 
-        console.print("\n[bold green]SERVER STARTED[/bold green]")
+        server_running = True   # 🔥 REAL STATE UPDATE
+
         add_log("Server Started")
 
         ip = get_local_ip()
+        console.print("\n[bold green]SERVER STARTED[/bold green]")
         console.print(f"[cyan]http://{ip}:8080[/cyan]\n")
 
     else:
         console.print("\n[yellow]Server already running.[/yellow]\n")
 
-
 def stop_server():
-    global server_process
+    global server_process, server_running
 
-    if server_process:
+    if server_running and server_process:
 
         server_process.terminate()
         server_process = None
 
-        console.print("\n[bold red]SERVER STOPPED[/bold red]\n")
+        server_running = False   # 🔥 REAL STATE UPDATE
+
         add_log("Server Stopped")
+
+        console.print("\n[bold red]SERVER STOPPED[/bold red]\n")
 
     else:
         console.print("\n[yellow]No server is running.[/yellow]\n")
-
 
 def view_logs():
 
@@ -121,7 +125,7 @@ while True:
         padding=(0, 3)
     )
 
-    status = "ONLINE" if server_process else "OFFLINE"
+    status = "ONLINE" if server_running else "OFFLINE"
 
     info_table.add_row(
         "[bold green]STATUS[/bold green]",

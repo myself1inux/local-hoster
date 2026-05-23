@@ -16,32 +16,22 @@ logs = []
 def clear():
     os.system("cls" if os.name == "nt" else "clear")
 
+
 def get_local_ip():
-
     try:
-
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
         s.connect(("8.8.8.8", 80))
-
         ip = s.getsockname()[0]
-
         s.close()
-
         return ip
-
     except:
-
         return "127.0.0.1"
 
 
 def add_log(message):
-
     current_time = datetime.now().strftime("%H:%M:%S")
+    logs.append(f"[{current_time}] {message}")
 
-    logs.append(
-        f"[{current_time}] {message}"
-    )
 
 def start_server():
     global server_process
@@ -56,6 +46,7 @@ def start_server():
 
         console.print("\n[bold green]SERVER STARTED[/bold green]")
         add_log("Server Started")
+
         ip = get_local_ip()
         console.print(f"[cyan]http://{ip}:8080[/cyan]\n")
 
@@ -91,6 +82,7 @@ def view_logs():
 
     else:
         console.print("\n[yellow]No logs available.[/yellow]\n")
+
 
 def about():
     console.print("\n[bold cyan]HOSTFLOW v1.0[/bold cyan]")
@@ -141,10 +133,10 @@ while True:
         "[white]8080[/white]"
     )
 
-info_table.add_row(
-    "[bold cyan]IP ADDRESS[/bold cyan]",
-    f"[white]{get_local_ip()}[/white]"
-)
+    info_table.add_row(
+        "[bold cyan]IP ADDRESS[/bold cyan]",
+        f"[white]{get_local_ip()}[/white]"
+    )
 
     status_panel = Panel(
         info_table,

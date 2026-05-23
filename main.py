@@ -3,6 +3,7 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.align import Align
 from datetime import datetime
+import socket
 import os
 import subprocess
 
@@ -14,6 +15,25 @@ logs = []
 
 def clear():
     os.system("cls" if os.name == "nt" else "clear")
+
+def get_local_ip():
+
+    try:
+
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+        s.connect(("8.8.8.8", 80))
+
+        ip = s.getsockname()[0]
+
+        s.close()
+
+        return ip
+
+    except:
+
+        return "127.0.0.1"
+
 
 def add_log(message):
 
@@ -36,7 +56,8 @@ def start_server():
 
         console.print("\n[bold green]SERVER STARTED[/bold green]")
         add_log("Server Started")
-        console.print("[cyan]http://localhost:8080[/cyan]\n")
+        ip = get_local_ip()
+        console.print(f"[cyan]http://{ip}:8080[/cyan]\n")
 
     else:
         console.print("\n[yellow]Server already running.[/yellow]\n")
@@ -119,6 +140,11 @@ while True:
         "[bold yellow]PORT[/bold yellow]",
         "[white]8080[/white]"
     )
+
+info_table.add_row(
+    "[bold cyan]IP ADDRESS[/bold cyan]",
+    f"[white]{get_local_ip()}[/white]"
+)
 
     status_panel = Panel(
         info_table,

@@ -33,25 +33,87 @@ def add_log(message):
     current_time = datetime.now().strftime("%H:%M:%S")
     logs.append(f"[{current_time}] {message}")
 
+def choose_folder():
+
+    current_path = os.getcwd()
+
+    while True:
+
+        clear()
+
+        console.print(
+            f"\n[bold cyan]CURRENT PATH:[/bold cyan] {current_path}\n"
+        )
+
+        items = os.listdir(current_path)
+
+        folders = []
+
+        for item in items:
+
+            full_path = os.path.join(current_path, item)
+
+            if os.path.isdir(full_path):
+                folders.append(item)
+
+        for index, folder in enumerate(folders, start=1):
+            console.print(f"[cyan][{index}][/cyan] {folder}")
+
+        console.print("\n[yellow][0][/yellow] Select This Folder")
+        console.print("[red][B][/red] Go Back\n")
+
+        choice = input("Select Folder > ")
+
+        if choice == "0":
+            return current_path
+
+        elif choice.lower() == "b":
+
+            parent = os.path.dirname(current_path)
+
+            if parent != current_path:
+                current_path = parent
+
+        elif choice.isdigit():
+
+            choice = int(choice)
+
+            if 1 <= choice <= len(folders):
+
+                current_path = os.path.join(
+                    current_path,
+                    folders[choice - 1]
+                )
 
 def start_server():
     global server_process, server_running
 
     if not server_running:
 
+        folder = choose_folder()
+
         server_process = subprocess.Popen(
-            ["python", "-m", "http.server", "8080"],
+            [
+                "python",
+                "-m",
+                "http.server",
+                "8080",
+                "--directory",
+                folder
+            ],
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL
         )
 
-        server_running = True   # 🔥 REAL STATE UPDATE
+        server_running = True
 
-        add_log("Server Started")
+        add_log(f"Server Started -> {folder}")
 
         ip = get_local_ip()
+
         console.print("\n[bold green]SERVER STARTED[/bold green]")
-        console.print(f"[cyan]http://{ip}:8080[/cyan]\n")
+        console.print(f"[cyan]http://{ip}:8080[/cyan]")
+        console.print(f"[white]Hosting Folder:[/white] {folder}\n")
 
     else:
         console.print("\n[yellow]Server already running.[/yellow]\n")
